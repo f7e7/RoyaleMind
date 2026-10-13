@@ -1,6 +1,12 @@
 import subprocess
+from datetime import UTC, datetime
+from io import BytesIO
+from pathlib import Path
+
+from PIL import Image
 
 from royale_mind import cli, diagnostics
+from royale_mind.capture import ReplayFrameSource
 from royale_mind.config import Settings, SettingsError
 from royale_mind.diagnostics import CheckStatus, Diagnostic
 
@@ -112,3 +118,31 @@ def test_missing_python_dependency_stops_startup_with_install_instructions(
 
     assert result == 1
     assert "ERROR: pydantic" in capsys.readouterr().out
+
+
+def test_capture_command_saves_frame_without_phone(tmp_path: Path, monkeypatch, capsys) -> None:
+    image = BytesIO()
+    Image.new("RGB", (16, 12)).save(image, format="PNG")
+    source_image = tmp_path / "fixture.png"
+    source_image.write_bytes(image.getvalue())
+    frame = ReplayFrameSource(
+        [source_image], timestamps=[datetime(2026, 1, 1, tzinfo=UTC)]
+    ).capture()
+    requested: dict[str, object] = {}
+
+    class FakeAdbSource:
+        def __init__(self, **kwargs: object) -> None:
+            requested.update(kwargs)
+
+        def capture(self):
+            return frame
+
+    monkeypatch.setattr(cli, "AdbScreenshotSource", FakeAdbSource)
+    monkeypatch.setattr(cli, "_load_settings", lambda: Settings())
+    monkeypatch.setattr(cli, "configure_logging", lambda **kwargs: None)
+    output_dir = tmp_path / "saved"
+    assert cli.main(["capture-frame", "--serial", "phone-1", "--output-dir", str(output_dir)]) == 0
+    assert requested["device_serial"] == "phone-1"
+    assert len(list(output_dir.glob("*.png"))) == 1
+    assert len(list(output_dir.glob("*.json"))) == 1
+    assert "Saved" in capsys.readouterr().out

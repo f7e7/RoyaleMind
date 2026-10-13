@@ -1,0 +1,165 @@
+{
+  "$defs": {
+    "ArenaCorrespondence": {
+      "additionalProperties": false,
+      "properties": {
+        "arena_point": {
+          "$ref": "#/$defs/CoordinatePoint"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "provenance": {
+          "minLength": 1,
+          "title": "Provenance",
+          "type": "string"
+        },
+        "screenshot_point": {
+          "$ref": "#/$defs/CoordinatePoint"
+        }
+      },
+      "required": [
+        "label",
+        "screenshot_point",
+        "arena_point",
+        "provenance"
+      ],
+      "title": "ArenaCorrespondence",
+      "type": "object"
+    },
+    "CoordinatePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "CoordinatePoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Per-image mapping evidence; no exact game coordinates are assumed.",
+  "properties": {
+    "arena_key": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Arena Key"
+    },
+    "calibrated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibrated At"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence"
+    },
+    "correspondences": {
+      "items": {
+        "$ref": "#/$defs/ArenaCorrespondence"
+      },
+      "title": "Correspondences",
+      "type": "array"
+    },
+    "fit_rmse": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fit Rmse"
+    },
+    "mapping_method": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Mapping Method"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "screenshot_height": {
+      "exclusiveMinimum": 0,
+      "title": "Screenshot Height",
+      "type": "integer"
+    },
+    "screenshot_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Screenshot Sha256",
+      "type": "string"
+    },
+    "screenshot_width": {
+      "exclusiveMinimum": 0,
+      "title": "Screenshot Width",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "screenshot_sha256",
+    "screenshot_width",
+    "screenshot_height"
+  ],
+  "title": "ArenaCalibration",
+  "type": "object"
+}

@@ -1,3 +1,5 @@
+import hashlib
+import json
 import subprocess
 from datetime import UTC, datetime
 from io import BytesIO
@@ -13,6 +15,7 @@ from royale_mind.capture import (
     DeviceUnavailable,
     InvalidFrame,
     ReplayFrameSource,
+    save_frame,
 )
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
@@ -137,3 +140,22 @@ def test_adb_rejects_empty_screenshot_bytes() -> None:
 
     with pytest.raises(InvalidFrame, match="no image bytes"):
         AdbScreenshotSource(runner=empty_screenshot).capture()
+
+
+def test_explicit_save_preserves_timestamp_dimensions_and_never_overwrites(
+    tmp_path: Path, monkeypatch
+) -> None:
+    image_path = tmp_path / "source.png"
+    image_path.write_bytes(png_bytes())
+    frame = ReplayFrameSource([image_path], timestamps=[NOW]).capture()
+    monkeypatch.setattr("royale_mind.capture.uuid4", lambda: type("UUID", (), {"hex": "fixed"})())
+    saved_image, metadata_path = save_frame(frame, tmp_path / "captures")
+    metadata = json.loads(metadata_path.read_text())
+    assert saved_image.read_bytes() == frame.image_bytes
+    assert metadata["captured_at"] == NOW.isoformat().replace("+00:00", "Z")
+    assert metadata["width"] == 32 and metadata["height"] == 24
+    assert metadata["source"] == "replay:source.png"
+    assert metadata["image_sha256"] == hashlib.sha256(frame.image_bytes).hexdigest()
+    with pytest.raises(FileExistsError):
+        save_frame(frame, tmp_path / "captures")
+    assert saved_image.read_bytes() == frame.image_bytes

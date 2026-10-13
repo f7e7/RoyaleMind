@@ -37,7 +37,7 @@ Configuration is loaded and validated at the application boundary. Structured lo
 - `FrameSource.capture()` returns a `Frame` containing encoded image bytes and `FrameMetadata` (capture time, dimensions, source, freshness), or raises a typed `CaptureError`. The contract does not expose OpenCV/NumPy objects.
 - ADB invocation is isolated here. Its allowed operations are limited to device status and screenshot acquisition; no input events or game-client manipulation.
 - `ReplayFrameSource` accepts ordered image paths and optional explicit timestamps. Without timestamps it uses the file modification time; it never invents a current timestamp for a replayed frame. Replay metadata leaves freshness unknown because filesystem metadata alone does not establish currentness. It reports missing/invalid input and exhausted sequences explicitly.
-- `AdbScreenshotSource` uses only ADB `get-state` and `exec-out screencap -p`. It supports optional serial selection and a bounded timeout. It handles missing devices, command failures, timeouts, absent bytes, and malformed/unsupported image data through typed errors; it does not persist frames.
+- `AdbScreenshotSource` uses only ADB `get-state` and `exec-out screencap -p`. It supports optional serial selection and a bounded timeout. It handles missing devices, command failures, timeouts, absent bytes, and malformed/unsupported image data through typed errors. The explicit `capture-frame` CLI command can save one frame and a provenance sidecar with exclusive file creation; ordinary capture does not persist frames.
 - PNG, JPEG, and WebP are accepted after image validation. This only establishes that the payload is a readable image, not that it depicts a supported game screen.
 
 ### `diagnostics` and application entry point
@@ -45,6 +45,14 @@ Configuration is loaded and validated at the application boundary. Structured lo
 - The `royalemind` console script enters through `royale_mind.cli:main`. With no subcommand it runs the startup health check; `health` checks required Python distributions and warns if optional ADB is missing; `devices` runs read-only `adb devices -l` and reports connected, unauthorized, offline, or absent devices.
 - Device diagnostics never invoke ADB settings, pairing, restart, or input commands. Subprocess calls have bounded timeouts and actionable errors. Tests inject/mimic process results; ordinary tests require no phone.
 - Startup, configuration, capture, diagnostics, and future analysis remain behind separate modules. `health` does not imply vision or dashboard readiness.
+
+### `data_acquisition`
+
+- `royale_mind.data_acquisition` owns pinned-source discovery/manifesting, source-specific JSON normalization, dataset inspection, arena calibration records, and coverage reports. It is not imported by vision or tactical logic.
+- The acquisition allowlist is bounded and pinned to a specific public revision. Downloads are timeout/retry limited, size-capped, SHA-256 recorded, JSON-validated, and fail rather than overwrite changed local raw snapshots.
+- Normalized records preserve source dictionaries and per-record provenance. Missing data stays absent; source values are not promoted to current verified mechanics.
+- Public images, videos, model weights, API secrets, and large archives are not fetched by default. Unknown-license data requires explicit private-research acknowledgement and remains ignored local data.
+- Dataset auditing is read-only. Arena mapping is constructed only from explicit measured correspondences; no gameplay geometry is embedded without evidence.
 
 ### `vision`
 
@@ -144,6 +152,7 @@ Dependency constraints:
 - `configure_logging` in `royale_mind.logging_setup` configures console output with JSON by default, or human-readable output when requested. Structured records should not include secrets, personal identifiers, or screenshot contents.
 - `royalemind` is the installed command. Its `health` and `devices` subcommands are diagnostic-only; omitted command defaults to health. `--log-level` overrides the validated settings level.
 - `royalemind health` checks required Python distributions; missing ADB is a warning because replay does not need it. The `devices` command treats no devices, unauthorized/offline devices, timeout, or command errors as a non-zero diagnostic result.
+- `acquire-data`, `audit-dataset`, `import-dataset-labels`, and `export-data-schemas` are opt-in data research tools. They do not run during application health checks and do not feed vision or strategy.
 - Pillow is used by the capture boundary to validate and read image dimensions; NumPy, OpenCV, ADB Python wrappers, Streamlit, and model dependencies are not part of the core package. Android Platform Tools are an optional external prerequisite for live screenshots.
 
 ## Failure and Uncertainty Handling

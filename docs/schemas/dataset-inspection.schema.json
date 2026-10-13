@@ -1,0 +1,88 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "annotation_count": {
+      "minimum": 0,
+      "title": "Annotation Count",
+      "type": "integer"
+    },
+    "annotation_formats": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Annotation Formats",
+      "type": "object"
+    },
+    "class_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Class Counts",
+      "type": "object"
+    },
+    "corrupt_images": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Corrupt Images",
+      "type": "array"
+    },
+    "duplicate_image_groups": {
+      "items": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Duplicate Image Groups",
+      "type": "array"
+    },
+    "image_count": {
+      "minimum": 0,
+      "title": "Image Count",
+      "type": "integer"
+    },
+    "inspected_at": {
+      "format": "date-time",
+      "title": "Inspected At",
+      "type": "string"
+    },
+    "malformed_annotations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Malformed Annotations",
+      "type": "array"
+    },
+    "root": {
+      "format": "path",
+      "title": "Root",
+      "type": "string"
+    },
+    "split_leaks": {
+      "items": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Split Leaks",
+      "type": "array"
+    },
+    "unsupported_files": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unsupported Files",
+      "type": "array"
+    }
+  },
+  "required": [
+    "root",
+    "inspected_at",
+    "image_count",
+    "annotation_count"
+  ],
+  "title": "DatasetInspection",
+  "type": "object"
+}

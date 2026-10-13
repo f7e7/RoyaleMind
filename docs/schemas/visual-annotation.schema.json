@@ -1,0 +1,131 @@
+{
+  "additionalProperties": false,
+  "description": "Normalized box record that retains original labels until reviewed mapping.",
+  "properties": {
+    "affiliation": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Affiliation"
+    },
+    "annotation_format": {
+      "minLength": 1,
+      "title": "Annotation Format",
+      "type": "string"
+    },
+    "annotation_path": {
+      "minLength": 1,
+      "title": "Annotation Path",
+      "type": "string"
+    },
+    "annotation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Annotation Sha256",
+      "type": "string"
+    },
+    "canonical_class_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Canonical Class Id"
+    },
+    "image_path": {
+      "minLength": 1,
+      "title": "Image Path",
+      "type": "string"
+    },
+    "image_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Image Sha256",
+      "type": "string"
+    },
+    "source_class_id": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Class Id"
+    },
+    "source_label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Label"
+    },
+    "split": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split"
+    },
+    "x_max": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "X Max",
+      "type": "number"
+    },
+    "x_min": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "X Min",
+      "type": "number"
+    },
+    "y_max": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Y Max",
+      "type": "number"
+    },
+    "y_min": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Y Min",
+      "type": "number"
+    }
+  },
+  "required": [
+    "image_path",
+    "image_sha256",
+    "annotation_path",
+    "annotation_sha256",
+    "annotation_format",
+    "x_min",
+    "y_min",
+    "x_max",
+    "y_max"
+  ],
+  "title": "VisualAnnotation",
+  "type": "object"
+}

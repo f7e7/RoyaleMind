@@ -41,6 +41,16 @@ royalemind health
 royalemind devices
 ```
 
+To save one screenshot after manually connecting and authorizing a phone, first read
+[the USB capture procedure](docs/android-capture.md). `capture-frame` uses only ADB status
+and screenshot requests; it writes an ignored image and JSON metadata pair and never
+replaces an existing pair:
+
+```bash
+royalemind devices
+royalemind capture-frame --serial YOUR_DEVICE_SERIAL --output-dir data/captures
+```
+
 Running `royalemind` with no subcommand is equivalent to `royalemind health`. `health` requires installed Python dependencies and reports missing ADB as a warning, because replay remains available without a phone. `devices` exits non-zero when ADB is missing, no device is connected, or any listed device is unauthorized/offline. Use `--log-level DEBUG|INFO|WARNING|ERROR|CRITICAL` to override the configured level. Application analysis workflows are not implemented yet.
 
 Run deterministic tests, linting, formatting, and type checking:
@@ -53,6 +63,18 @@ mypy
 ```
 
 ADB and physical devices are not required for ordinary unit tests; device subprocess calls are mocked.
+
+## Data Research Tools
+
+The current data pipeline retrieves a bounded, pinned JSON metadata allowlist only. RoyaleAPI `cr-api-data` has no declared repository license, so its import requires an explicit private-research acknowledgement and stays in ignored local `data/`:
+
+```bash
+royalemind acquire-data --accept-unknown-license-local-only --output data
+royalemind audit-dataset /path/to/approved/dataset --output data/reports/dataset-inspection.json
+royalemind export-data-schemas --output docs/schemas
+```
+
+Review [data sources](docs/data-sources.md), [measured coverage and gaps](docs/data-coverage.md), [dataset ingestion policy](docs/dataset-collection.md), and [arena calibration](docs/arena-calibration.md) before importing third-party imagery or using source mechanics as current facts.
 
 The configuration loader reads `royalemind.toml` (or the path in `ROYALEMIND_CONFIG`) when present. A missing file uses validated local defaults. Live capture is optional and requires Android Platform Tools (`adb`) installed and an authorized device; replay tests do not require ADB. Capture supports PNG, JPEG, and WebP screenshots and does not persist acquired frames. Keep private configuration, screenshots, recordings, datasets, and generated model artifacts out of Git.
 

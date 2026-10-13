@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -9,6 +11,7 @@ from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
 from typing import Protocol
+from uuid import uuid4
 
 from PIL import Image, UnidentifiedImageError
 
@@ -184,3 +187,35 @@ class AdbScreenshotSource:
             source=source,
             freshness=Freshness.FRESH,
         )
+
+
+def save_frame(frame: Frame, output_dir: Path) -> tuple[Path, Path]:
+    """Persist an explicitly requested frame and provenance, never replacing existing files."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    suffix = {"PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp"}[frame.image_format]
+    timestamp = frame.metadata.captured_at.astimezone(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    stem = f"frame-{timestamp}-{uuid4().hex}"
+    image_path = output_dir / f"{stem}{suffix}"
+    metadata_path = output_dir / f"{stem}.json"
+    metadata = {
+        **frame.metadata.model_dump(mode="json"),
+        "image_format": frame.image_format,
+        "image_sha256": hashlib.sha256(frame.image_bytes).hexdigest(),
+        "capture_method": (
+            "adb exec-out screencap -p"
+            if frame.metadata.source.startswith("adb:")
+            else "local replay"
+        ),
+        "image_file": image_path.name,
+    }
+    with image_path.open("xb") as image_file:
+        image_file.write(frame.image_bytes)
+    try:
+        with metadata_path.open("x", encoding="utf-8") as metadata_file:
+            json.dump(metadata, metadata_file, indent=2, sort_keys=True)
+            metadata_file.write("\n")
+    except OSError:
+        image_path.unlink()
+        raise
+    return image_path, metadata_path

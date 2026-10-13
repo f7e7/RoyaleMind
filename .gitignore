@@ -23,6 +23,7 @@ datasets/
 artifacts/
 models/
 data/
+reports/
 *.png
 *.jpg
 *.jpeg

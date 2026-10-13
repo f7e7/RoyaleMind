@@ -118,3 +118,7 @@ Acceptance criteria:
 - Pin supported dependency versions when packaging is added. Separate runtime, development/test, and optional live-capture/model dependencies to avoid requiring a phone or model for offline tests.
 - User decisions listed in `docs/architecture.md` are phase-specific gates: device/layout decisions before Phase 1/2; scope and data policy before Phase 2; rule-data source before Phase 4; latency target before performance optimization. Reasonable local-only defaults may be documented for exploration but must not be presented as user-approved product requirements.
 - Each phase should produce independently testable changes and update docs when it resolves or changes a decision. Do not add future-phase components speculatively.
+
+## Data Research Infrastructure Status
+
+The optional bounded acquisition and validation tooling is implemented in `royale_mind.data_acquisition`; it does not feed vision or strategy. Source decisions, local coverage, limitations, dataset policy, and calibration are documented in `docs/data-sources.md`, `docs/data-coverage.md`, `docs/dataset-collection.md`, and `docs/arena-calibration.md`. The current imported metadata is a stale, license-unclear local research snapshot, not an approved runtime knowledge base.
