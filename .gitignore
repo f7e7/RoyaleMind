@@ -1,0 +1,44 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local configuration and secrets
+royalemind.local.toml
+royalemind.toml
+.env
+.env.*
+!.env.example
+
+# Captures, temporary frames, datasets, and generated artifacts
+frames/
+recordings/
+datasets/
+artifacts/
+models/
+data/
+*.png
+*.jpg
+*.jpeg
+*.webp
+!tests/fixtures/**/*.png
+!tests/fixtures/**/*.jpg
+!tests/fixtures/**/*.jpeg
+!tests/fixtures/**/*.webp
+*.onnx
+*.pt
+*.pth
+*.safetensors
+
+# Build and editor artifacts
+build/
+dist/
+*.egg-info/
+.idea/
+.vscode/
